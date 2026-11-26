@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * Theme tokens (RGB triplets so Tailwind opacity modifiers work: bg-fg/10)
+ * Light is the :root default; `.dark` on <html> switches to dark mode.
+ * ------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    color-scheme: light;
+    --c-app: 246 246 244;
+    --c-panel: 255 255 255;
+    --c-card: 255 255 255;
+    --c-elev: 241 241 239;
+    --c-line: 229 229 226;
+    --c-line-strong: 208 208 204;
+    --c-fg: 24 24 27;
+    --c-muted: 113 113 122;
+    --c-subtle: 161 161 170;
+    --c-danger: 220 38 38;
+    --c-success: 22 163 74;
+    --c-warn: 217 119 6;
+    --c-info: 37 99 235;
+    --glow: 0 0 0 1px rgb(var(--c-line-strong)), 0 6px 20px -6px rgb(0 0 0 / 0.15);
+  }
+
+  .dark {
+    color-scheme: dark;
+    --c-app: 9 9 9;
+    --c-panel: 17 17 17;
+    --c-card: 22 22 22;
+    --c-elev: 30 30 30;
+    --c-line: 38 38 38;
+    --c-line-strong: 60 60 60;
+    --c-fg: 237 237 237;
+    --c-muted: 140 140 140;
+    --c-subtle: 92 92 92;
+    --c-danger: 239 68 68;
+    --c-success: 74 222 128;
+    --c-warn: 251 191 36;
+    --c-info: 96 165 250;
+    --glow: 0 0 0 1px rgb(255 255 255 / 0.22), 0 0 22px -2px rgb(255 255 255 / 0.12);
+  }
+
+  body {
+    @apply bg-app text-fg font-sans antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  select option {
+    background: rgb(var(--c-panel));
+    color: rgb(var(--c-fg));
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-line-strong));
+    border-radius: 9999px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Reusable component primitives
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .panel {
+    @apply bg-panel border border-line rounded-xl;
+  }
+  .card {
+    @apply bg-card border border-line rounded-lg transition-all duration-150;
+  }
+  .card-glow:hover,
+  .card-glow.is-active {
+    box-shadow: var(--glow);
+    @apply border-line-strong;
+  }
+  .section-label {
+    @apply font-mono text-[11px] uppercase tracking-[0.08em] text-muted;
+  }
+  .mono-tag {
+    @apply font-mono text-[10px] uppercase tracking-wider;
+  }
+  .btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line-strong text-xs font-medium text-fg hover:bg-elev transition-colors whitespace-nowrap;
+  }
+  .btn-solid {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-fg text-app hover:opacity-90 transition-opacity whitespace-nowrap;
+  }
+  .btn-soft {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-elev text-fg border border-line hover:border-line-strong transition-colors whitespace-nowrap;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-line text-muted hover:text-danger hover:border-danger/50 transition-colors;
+  }
+  .icon-btn {
+    @apply p-1 rounded-md text-muted hover:text-fg hover:bg-elev transition-colors;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-line text-[10px] font-mono text-muted;
+  }
+  .input {
+    @apply w-full px-3 py-2 rounded-lg bg-app border border-line text-fg text-xs placeholder:text-subtle focus:outline-none focus:border-line-strong focus:ring-2 focus:ring-fg/10 transition-shadow;
+  }
+  .label {
+    @apply block font-mono text-[10px] uppercase tracking-wider text-muted mb-1.5;
+  }
+  .dashed-add {
+    @apply w-full py-2 rounded-lg border border-dashed border-line-strong text-xs text-muted hover:text-fg hover:border-subtle hover:bg-elev/60 transition-colors;
+  }
+  .seg {
+    @apply inline-flex items-center p-0.5 rounded-lg bg-elev border border-line;
+  }
+  .seg-item {
+    @apply px-2.5 py-1 rounded-md text-[11px] font-medium text-muted hover:text-fg transition-colors;
+  }
+  .seg-item.is-active {
+    @apply bg-panel text-fg shadow-sm;
+  }
+}
