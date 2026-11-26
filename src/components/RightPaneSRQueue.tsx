@@ -214,10 +214,9 @@ export const RightPaneSRQueue: React.FC<RightPaneProps> = ({
                         {subj.label}
                       </span>
                       {subj.isNeglected && (
-                        <AlertTriangle
-                          className="w-3 h-3 text-warn shrink-0"
-                          title="Not studied for >7 days"
-                        />
+                        <span title="Not studied for >7 days" className="inline-flex shrink-0">
+                          <AlertTriangle className="w-3 h-3 text-warn" />
+                        </span>
                       )}
                     </div>
                     <div className="mt-0.5 flex items-center gap-2 font-mono text-[10px] text-muted">
