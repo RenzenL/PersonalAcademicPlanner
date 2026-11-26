@@ -20,6 +20,7 @@ import { useAcademicStore } from '../store/useAcademicStore';
 import { diffDays, getTodayDateKey } from '../utils/dateUtils';
 import { evaluateDayDiagnostics } from '../engines/rippleEngine';
 import { formatHours } from './ui';
+import { CloudSyncControl } from './CloudSyncControl';
 
 interface TopBarProps {
   onOpenNewTask: () => void;
@@ -254,6 +255,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button onClick={() => fileInputRef.current?.click()} className="icon-btn" title="Import JSON">
           <Upload className="w-4 h-4" />
         </button>
+        <CloudSyncControl />
 
         <button
           onClick={() => setRightPaneCollapsed(!isRightPaneCollapsed)}

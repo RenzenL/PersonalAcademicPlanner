@@ -39,3 +39,27 @@ A full-stack, local-first academic planner, modular study block manager, and SM-
 npm install
 npm run dev
 ```
+
+## Cross-device Cloud Sync (Supabase)
+
+The planner saves locally by default. To sync data between devices, configure
+Supabase:
+
+1. Create a Supabase project and run [`supabase/schema.sql`](supabase/schema.sql)
+   in its SQL Editor. The table uses row-level security so each account can
+   access only its own planner data.
+2. Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and
+   `VITE_SUPABASE_ANON_KEY` from the Supabase project's API settings.
+3. Run `npm install`, then restart the Vite server. In the app, choose **Cloud
+   Sync → Create account** on the first device, then sign in with that account
+   on other devices.
+4. For a deployed build, configure the same two `VITE_` variables in the
+   hosting provider's build environment and rebuild/redeploy. These values are
+   included in the browser app; use only the public anon/publishable key, never
+   a `service_role` key. Row-level security protects the stored planner data.
+
+On the first sign-in, existing local planner data is uploaded if the cloud
+account has no data. If both copies already contain different data, the app
+asks which copy to keep. Cloud changes are applied in real time; avoid editing
+the same account simultaneously on multiple devices, since the planner is
+stored as one document rather than merged record-by-record.
