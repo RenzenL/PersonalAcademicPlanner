@@ -80,7 +80,8 @@ export const CloudSyncControl: React.FC = () => {
   const retryConnectionRef = useRef<((session: Session) => void) | null>(null);
 
   useEffect(() => {
-    if (!supabase) return;
+    const client = supabase;
+    if (!client) return;
 
     let active = true;
     let channel: RealtimeChannel | null = null;
@@ -88,7 +89,7 @@ export const CloudSyncControl: React.FC = () => {
 
     const stopRealtime = () => {
       if (channel) {
-        void supabase.removeChannel(channel);
+        void client.removeChannel(channel);
         channel = null;
       }
     };
@@ -115,7 +116,7 @@ export const CloudSyncControl: React.FC = () => {
           const signature = getBackupSignature(backup);
           if (signature === lastSyncedSignatureRef.current) continue;
 
-          const { error } = await supabase
+          const { error } = await client
             .from('kronos_data')
             .upsert(
               {
@@ -162,13 +163,15 @@ export const CloudSyncControl: React.FC = () => {
     };
 
     const applyRemoteBackup = (backup: AcademicBackupPayload) => {
+      const prevSignature = lastSyncedSignatureRef.current;
+      lastSyncedSignatureRef.current = getBackupSignature(backup);
       const result = useAcademicStore
         .getState()
         .importBackupJSON(JSON.stringify(backup));
       if (!result.ok) {
+        lastSyncedSignatureRef.current = prevSignature;
         throw new Error(result.error || 'Could not load cloud planner data.');
       }
-      lastSyncedSignatureRef.current = getBackupSignature(backup);
     };
 
     const resolveConflict = async (choice: 'local' | 'remote') => {
@@ -183,7 +186,7 @@ export const CloudSyncControl: React.FC = () => {
           applyRemoteBackup(currentConflict.remote);
         } else {
           const local = getLocalBackup();
-          const { error } = await supabase.from('kronos_data').upsert(
+          const { error } = await client.from('kronos_data').upsert(
             {
               user_id: userId,
               data: local,
@@ -211,7 +214,7 @@ export const CloudSyncControl: React.FC = () => {
 
     function attachRealtime(userId: string) {
       stopRealtime();
-      channel = supabase
+      channel = client
         .channel(`kronos-data-${userId}`)
         .on(
           'postgres_changes',
@@ -295,7 +298,7 @@ export const CloudSyncControl: React.FC = () => {
       stopRealtime();
 
       const localBeforeLoad = getLocalBackup();
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('kronos_data')
         .select('data')
         .eq('user_id', userId)
@@ -312,7 +315,7 @@ export const CloudSyncControl: React.FC = () => {
       try {
         const local = getLocalBackup();
         if (!data) {
-          const { error: saveError } = await supabase.from('kronos_data').upsert(
+          const { error: saveError } = await client.from('kronos_data').upsert(
             {
               user_id: userId,
               data: local,
@@ -344,7 +347,7 @@ export const CloudSyncControl: React.FC = () => {
           }
 
           if (localHasData && !remoteHasData) {
-            const { error: saveError } = await supabase.from('kronos_data').upsert(
+            const { error: saveError } = await client.from('kronos_data').upsert(
               {
                 user_id: userId,
                 data: local,
@@ -396,7 +399,7 @@ export const CloudSyncControl: React.FC = () => {
       }, 0);
     };
 
-    const authSubscription = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const authSubscription = client.auth.onAuthStateChange((_event, nextSession) => {
       handleSession(nextSession);
     });
 
@@ -451,7 +454,9 @@ export const CloudSyncControl: React.FC = () => {
 
   const handleSignOut = async () => {
     if (!supabase) return;
-    if (readyRef.current && !(await syncNow())) return;
+    if (readyRef.current) {
+      await syncNow();
+    }
     const { error } = await supabase.auth.signOut();
     if (error) setErrorMessage(error.message);
   };
